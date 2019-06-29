@@ -1,5 +1,6 @@
 import requests
 
+from controllers.proxy import proxy
 from config import get_settings
 from flask import Flask, request, abort, jsonify, Response, redirect, url_for
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
@@ -16,8 +17,12 @@ def get_app(config=get_settings()):
     app.config.from_object(config)
 
     register_extensions(app)
+    register_blueprints(app)
 
     return app
+
+def register_blueprints(app):
+    app.register_blueprint(proxy, url_prefix="/proxy")
 
 def register_extensions(app):
     api = Api(app)
