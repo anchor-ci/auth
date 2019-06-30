@@ -1,4 +1,12 @@
 import os
+import sys
+
+class ProviderSettings:
+    pass
+
+class GithubSettings:
+    BASE_URL = "https://api.github.com"
+    FILE_ENDPOINT = "/repos/{owner}/{repo}/contents/{path}"
 
 class Settings:
     # in days
@@ -18,6 +26,18 @@ class NonprodSettings(Settings):
 
 class ProdSettings(Settings):
     pass
+
+def get_provider_settings(provider: str) -> ProviderSettings:
+    module = sys.modules[__name__]
+    reduced = list(
+        filter(lambda x: provider in x.lower(), dir(module))
+    )
+
+    # Instantiate and return the first selection
+    if reduced:
+        return getattr(module, reduced[0])()
+
+    return None
 
 def get_settings():
     env = os.environ.get('ENVIRONMENT', 'nonprod')

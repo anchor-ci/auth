@@ -1,5 +1,5 @@
 from models import User
-from repository import ProxyRequest
+from repository import ProxyRequest, CiFileRequest
 from marshmallow import (
     Schema,
     fields,
@@ -15,6 +15,7 @@ PROVIDERS = (
 )
 
 class UserSchema(Schema):
+    id = fields.UUID(dump_only=True)
     username = fields.String(required=True)
     email = fields.Email(required=True)
     password = fields.Str(load_only=True, required=True)
@@ -43,12 +44,23 @@ class ProxyRequestSchema(Schema):
 
     @pre_load
     def fix_data(self, data, **kwargs):
-        if data is None:
-            return
-
-        if "provider" in data:
+        if data and "provider" in data:
             data["provider"] = data["provider"].lower()
 
     @post_load
     def load_request(self, data, **kwargs):
        return ProxyRequest(**data)
+
+class AnchorFileRequestSchema(Schema):
+    provider = fields.Str(validate=validate.OneOf(PROVIDERS), required=True)
+    user = fields.UUID(required=True)
+    file_path = fields.Str(default=".anchorci.yml")
+
+    @pre_load
+    def fix_data(self, data, **kwargs):
+        if data and "provider" in data:
+            data["provider"] = data["provider"].lower()
+
+    @post_load
+    def make_file_request(self, data, **kwargs):
+        return CiFileRequest(**data)

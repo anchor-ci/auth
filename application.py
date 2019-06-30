@@ -99,6 +99,7 @@ def register_extensions(app):
             return jsonify({}), 400
 
     api.add_resource(ValidRoute, '/verify')
+    api.add_resource(UserRoute, '/users')
 
     login_manager = LoginManager(app)
 
