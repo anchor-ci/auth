@@ -52,9 +52,11 @@ class ProxyRequestSchema(Schema):
        return ProxyRequest(**data)
 
 class AnchorFileRequestSchema(Schema):
-    provider = fields.Str(validate=validate.OneOf(PROVIDERS), required=True)
     user = fields.UUID(required=True)
-    file_path = fields.Str(default=".anchorci.yml")
+    repository = fields.Str(required=True)
+    provider_user = fields.Str(missing=None)
+    file_path = fields.Str(missing=".anchorci.yml")
+    provider = fields.Str(validate=validate.OneOf(PROVIDERS), required=True)
 
     @pre_load
     def fix_data(self, data, **kwargs):
@@ -63,4 +65,7 @@ class AnchorFileRequestSchema(Schema):
 
     @post_load
     def make_file_request(self, data, **kwargs):
+        if not data.get("provider_user"):
+            data["provider_user"] = data.get("user")
+
         return CiFileRequest(**data)
