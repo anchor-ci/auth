@@ -41,9 +41,9 @@ class CiFileRequest:
         content = self._do_request(url)
 
         if content == None:
-            return {}, 404
+            return {}
         else:
             content = content.decode('utf-8')
-            return {"content": content}, 200
+            return {"content": content}
 
-        return {}, 400
+        return {}

@@ -40,6 +40,9 @@ def get_ci_file():
         return jsonify(result.errors), 400
     else:
         contents = result.data.make_request()
-        return jsonify(contents), 200
+        code = 200
+        if not contents:
+            code = 404
+        return jsonify(contents), code
 
     return {"error": "you shouldn't get here!"}, 400
