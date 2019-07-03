@@ -6,43 +6,29 @@ access to the user's oauth token.
 """
 
 from marshmallow.exceptions import ValidationError
-from schema import ProxyRequestSchema, AnchorFileRequestSchema
+from schema import AnchorFileRequestSchema
 from flask import Blueprint, request, jsonify
+from flask_restful import Api, Resource
 from config import get_settings
 
 proxy = Blueprint('proxies', __name__)
+api = Api(proxy)
 
-@proxy.route("")
-def proxy_request():
-    data = {}
+class FileProxy(Resource):
+    def get(self):
+        data = getattr(request, "json", {})
+        schema = AnchorFileRequestSchema()
+        result = schema.load(data)
 
-    if request.json:
-        data = request.json
+        if result.errors:
+            return result.errors, 400
+        else:
+            contents = result.data.make_request()
+            code = 200
+            if not contents:
+                code = 404
+            return contents, code
 
-    schema = ProxyRequestSchema()
-    result = schema.load(data)
+        return {"error": "you shouldn't get here!"}, 400
 
-    if result.errors:
-        return jsonify(result.errors), 400
-
-    return jsonify({}), 200
-
-@proxy.route("/file")
-def get_ci_file():
-    data = {}
-    if request.json:
-        data = request.json
-
-    schema = AnchorFileRequestSchema()
-    result = schema.load(data)
-
-    if result.errors:
-        return jsonify(result.errors), 400
-    else:
-        contents = result.data.make_request()
-        code = 200
-        if not contents:
-            code = 404
-        return jsonify(contents), code
-
-    return {"error": "you shouldn't get here!"}, 400
+api.add_resource(FileProxy, "/file")

@@ -12,6 +12,10 @@ from config import get_settings
 settings = get_settings()
 db = SQLAlchemy()
 
+class Organization(db.Model):
+    id = db.Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid4)
+    name = db.Column(db.String(255), nullable=False)
+
 class User(UserMixin, db.Model):
     id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid4, primary_key=True)
     username = db.Column(db.String(127), unique=True, nullable=False)
@@ -19,7 +23,15 @@ class User(UserMixin, db.Model):
     register_time = db.Column(db.DateTime, nullable=False)
     name = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, username, email, name):
+    # For when a user is a part of an organization
+    org_id = db.Column(UUID(as_uuid=True), db.ForeignKey(Organization.id), nullable=True, default=None)
+    organization = db.relationship(Organization)
+
+    def __init__(self, username, email, name, organization=None):
+        if organization:
+            self.org_id = organization.id
+
+        self.organization = organization
         self.username = username
         self.email = email
         self.register_time = datetime.datetime.now()

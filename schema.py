@@ -1,4 +1,4 @@
-from models import User
+from models import User, Organization
 from repository import ProxyRequest, CiFileRequest
 from marshmallow import (
     Schema,
@@ -14,6 +14,14 @@ PROVIDERS = (
     "github"
 )
 
+class OrganizationSchema(Schema):
+    id = fields.UUID(dump_only=True)
+    name = fields.String(required=True)
+
+    @post_load
+    def make_org(self, data, **kwargs):
+        return Organization(**data)
+
 class UserSchema(Schema):
     id = fields.UUID(dump_only=True)
     username = fields.String(required=True)
@@ -22,6 +30,7 @@ class UserSchema(Schema):
     first_name = fields.Str(required=True)
     last_name = fields.Str(required=True)
     register_time = fields.DateTime(dump_only=True, required=True)
+    organization = fields.Nested(OrganizationSchema)
 
     @validates('username')
     def validate_username(self, data, **kwargs):
@@ -35,28 +44,14 @@ class UserSchema(Schema):
     def make_user(self, data, **kwargs):
         return User(**data)
 
-class ProxyRequestSchema(Schema):
-    # TODO: Add a URL field that is auto-generated from provider / path
-    provider = fields.Str(validate=validate.OneOf(PROVIDERS), required=True)
-    endpoint = fields.Str(required=True)
-    # Who to make calls on behalf of 
-    user = fields.UUID(required=True)
-
-    @pre_load
-    def fix_data(self, data, **kwargs):
-        if data and "provider" in data:
-            data["provider"] = data["provider"].lower()
-
-    @post_load
-    def load_request(self, data, **kwargs):
-       return ProxyRequest(**data)
-
 class AnchorFileRequestSchema(Schema):
-    user = fields.UUID(required=True)
+    owner = fields.UUID(required=True)
     repository = fields.Str(required=True)
-    provider_user = fields.Str(missing=None)
+    # provider_owner is their provider respective username
+    provider_owner = fields.Str(missing=None)
     file_path = fields.Str(missing=".anchorci.yml")
     provider = fields.Str(validate=validate.OneOf(PROVIDERS), required=True)
+    is_organization = fields.Bool(required=True)
 
     @pre_load
     def fix_data(self, data, **kwargs):
@@ -65,7 +60,7 @@ class AnchorFileRequestSchema(Schema):
 
     @post_load
     def make_file_request(self, data, **kwargs):
-        if not data.get("provider_user"):
-            data["provider_user"] = data.get("user")
+        if not data.get("provider_owner"):
+            data["provider_owner"] = data.get("owner")
 
         return CiFileRequest(**data)

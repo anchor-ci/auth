@@ -3,6 +3,7 @@ import requests
 from base64 import b64decode
 from config import get_provider_settings
 from dataclasses import dataclass
+from models import db, Organization, User
 
 @dataclass
 class ProxyRequest:
@@ -13,10 +14,11 @@ class ProxyRequest:
 @dataclass
 class CiFileRequest:
     provider: str
-    user: str
+    owner: str
     file_path: str
-    provider_user: str
+    provider_owner: str
     repository: str
+    is_organization: bool
 
     def _do_request(self, url):
         response = requests.get(url)
@@ -31,8 +33,19 @@ class CiFileRequest:
 
     def make_request(self):
         settings = get_provider_settings(self.provider)
+        owner = None
+
+        if self.is_organization:
+            owner = Organization.query.filter_by(
+                id=self.owner
+            ).first().name
+        else:
+            owner = User.query.filter_by(
+                id=self.owner
+            ).first().username
+
         endpoint = settings.FILE_ENDPOINT.format(
-            owner=self.provider_user,
+            owner=owner,
             repo=self.repository,
             path=self.file_path
         )
