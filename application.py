@@ -1,6 +1,6 @@
 import requests
 
-from controllers import proxy, org
+from controllers import proxy, org, sync
 from config import get_settings
 from flask import Flask, request, abort, jsonify, Response, redirect, url_for
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
@@ -101,6 +101,7 @@ def register_extensions(app):
 
     api.add_resource(ValidRoute, '/verify')
     api.add_resource(UserRoute, '/users')
+    app.register_blueprint(sync)
 
     login_manager = LoginManager(app)
 

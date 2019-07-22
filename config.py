@@ -7,6 +7,7 @@ class ProviderSettings:
 class GithubSettings:
     BASE_URL = "https://api.github.com"
     FILE_ENDPOINT = "/repos/{owner}/{repo}/contents/{path}"
+    REPO_ENDPOINT = "/users/{user}/repos"
 
 class Settings:
     # in days

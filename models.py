@@ -38,6 +38,10 @@ class User(UserMixin, db.Model):
         self.name = name
 
     @staticmethod
+    def from_uid(uid):
+        return User.query.get(uid)
+
+    @staticmethod
     def decode_auth_token(token):
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
