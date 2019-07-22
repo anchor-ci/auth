@@ -14,7 +14,7 @@ db = SQLAlchemy()
 
 class Organization(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid4)
-    name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False, unique=True)
 
 class User(UserMixin, db.Model):
     id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid4, primary_key=True)

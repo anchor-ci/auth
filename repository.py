@@ -38,11 +38,18 @@ class CiFileRequest:
         if self.is_organization:
             owner = Organization.query.filter_by(
                 id=self.owner
-            ).first().name
+            ).first()
+            if owner:
+                owner = owner.name
         else:
             owner = User.query.filter_by(
                 id=self.owner
-            ).first().username
+            ).first()
+            if owner:
+                owner = owner.username
+
+        if not owner:
+            return owner
 
         endpoint = settings.FILE_ENDPOINT.format(
             owner=owner,

@@ -19,7 +19,7 @@ class Settings:
     GITHUB_USER_URL = "https://api.github.com/user"
 
 class NonprodSettings(Settings):
-    SQLALCHEMY_DATABASE_URI = f"postgres://postgres:docker@{os.environ.get('DB_URL', 'db')}:5432"
+    SQLALCHEMY_DATABASE_URI = f"postgres://postgres:docker@{os.environ.get('DB_URL', 'db')}:{os.environ.get('DB_PORT', 5432)}"
     table_name = "users"
     database = ""
     FRONTEND_URI = "http://localhost:3000/home"
