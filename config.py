@@ -24,6 +24,8 @@ class NonprodSettings(Settings):
     table_name = "users"
     database = ""
     FRONTEND_URI = "http://localhost:3000/home"
+    JOB_URL = "http://172.18.0.6:8080"
+    JOB_REPO_ENDPOINT = "/repo"
 
 class ProdSettings(Settings):
     pass
