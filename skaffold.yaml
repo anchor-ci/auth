@@ -1,0 +1,14 @@
+apiVersion: skaffold/v1beta13
+kind: Config
+metadata:
+  name: auth
+build:
+  artifacts:
+  - image: auth
+    context: .
+    docker:
+      dockerfile: Dockerfile
+deploy:
+  kubectl:
+    manifests:
+      - kubernetes/*.yaml

@@ -1,9 +1,7 @@
 import jwt
 import datetime
 
-from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
@@ -16,7 +14,7 @@ class Organization(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid4)
     name = db.Column(db.String(255), nullable=False, unique=True)
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid4, primary_key=True)
     username = db.Column(db.String(127), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)

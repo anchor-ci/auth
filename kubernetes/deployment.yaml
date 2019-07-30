@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  labels:
+    app: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: service
+          image: auth:latest
+          env:
+            - name: DB_USER
+              value: postgres
+            - name: DB_PASSWORD
+              value: docker
+            - name: DB_URL
+              value: postgres.default.svc.cluster.local
+            - name: DB_PORT
+              value: "5432"
+          ports:
+            - containerPort: 80

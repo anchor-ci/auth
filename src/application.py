@@ -3,14 +3,10 @@ import requests
 from controllers import proxy, org, sync
 from config import get_settings
 from flask import Flask, request, abort, jsonify, Response, redirect, url_for
-from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
-from flask_login import current_user, LoginManager, login_user, logout_user
-from flask_dance.contrib.github import make_github_blueprint, github
 from flask_restful import Resource, Api
 from flask_cors import CORS, cross_origin
 from schema import UserSchema
 from models import db, User, OAuth
-from flask_dance.consumer import oauth_authorized
 
 def get_app(config=get_settings()):
     app = Flask(__name__)
@@ -102,8 +98,6 @@ def register_extensions(app):
     api.add_resource(ValidRoute, '/verify')
     api.add_resource(UserRoute, '/users')
     app.register_blueprint(sync)
-
-    login_manager = LoginManager(app)
 
     db.init_app(app)
 
