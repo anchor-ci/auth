@@ -39,6 +39,7 @@ def register_extensions(app):
         }
 
         if payload.get('code'):
+            print(payload)
             response = requests.post(
                 app.config.get('GITHUB_OAUTH_URL'),
                 json=payload,
@@ -47,9 +48,8 @@ def register_extensions(app):
 
             # Check if the code has expired
             body = response.json()
-            reason = body.get('error')
-            if reason == "bad_verification_code":
-                return jsonify({"status":"failed"}), 409
+            print(response.status_code)
+            print(body)
 
             if response.status_code == 200:
                 token = response.json().get('access_token')
@@ -92,8 +92,12 @@ def register_extensions(app):
                 db.session.commit()
 
                 return user.encode_auth_token(), 201
+            else:
+                return jsonify({"status":"failed"}), 409
         else:
             return jsonify({}), 400
+
+        return jsonify({"error": "fallthrough"}), 400
 
     api.add_resource(ValidRoute, '/verify')
     api.add_resource(UserRoute, '/users')
