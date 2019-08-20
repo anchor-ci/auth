@@ -1,6 +1,7 @@
 import requests
+import logging
 
-from controllers import proxy, org, sync, auth
+from controllers import proxy, org, sync, auth, assistant
 from config import get_settings
 from flask import Flask, request, abort, jsonify, Response, redirect, url_for
 from flask_restful import Resource, Api
@@ -21,6 +22,7 @@ def register_blueprints(app):
     app.register_blueprint(auth, url_prefix="/auth")
     app.register_blueprint(proxy, url_prefix="/proxy")
     app.register_blueprint(org, url_prefix="/organization")
+    app.register_blueprint(assistant, url_prefix="/assist")
     app.register_blueprint(sync)
 
 def register_extensions(app):
@@ -74,9 +76,14 @@ class UserRoute(Resource):
 
         abort(500)
 
-application = get_app()
+headers = [
+    "Content-Type",
+    "Access-Control-Allow-Credentials",
+    "x-api-key"
+]
 
-CORS(application, origins="*", allow_headers=["Content-Type", "Access-Control-Allow-Credentials", "x-api-key"])
+application = get_app()
+CORS(application, origins="*", allow_headers=headers, expose_headers=headers)
 
 if __name__ == '__main__':
     application.run(debug=True, host="0.0.0.0", port=9000)
