@@ -31,8 +31,9 @@ class Settings:
 
 class NonprodSettings(Settings):
     FRONTEND_URI = "http://localhost:3000/home"
-    AUTH_URL = "http://192.168.39.42:30001"
-    JOB_URL = "http://192.168.39.42:30002"
+    AUTH_URL = "http://192.168.39.217:30001"
+    JOB_URL = "http://192.168.39.217:30002"
+    JOB_REPO_ENDPOINT = "/repo"
 
 class ProdSettings(Settings):
     pass

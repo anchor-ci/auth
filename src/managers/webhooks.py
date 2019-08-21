@@ -1,5 +1,6 @@
 import requests
 
+from models import OAuth
 from config import get_settings, get_provider_settings
 
 class WebhookManager:
@@ -20,11 +21,27 @@ class WebhookManager:
         }
 
     def create_webhook(self, owner, repo, url, provider="github"):
-        base_url = self.provider_settings[provider].BASE_URL
-        endpoint = self.provider_settings[provider].WEBHOOK_CREATE_ENDPOINT
-        complete_url = "".join([base_url, endpoint])
+        oauth = OAuth.query.filter_by(
+            user_id=owner.id
+        ).scalar()
 
-        payload = self.generate_hook_config(url)
-        response = requests.post(complete_url, payload)
+        if not oauth:
+            return None
+
+        base_url = self.provider_settings[provider].BASE_URL
+        endpoint = self.provider_settings[provider].WEBHOOK_CREATE_ENDPOINT.format(
+            owner=owner.username,
+            repo=repo
+        )
+
+        complete_url = "".join([base_url, endpoint])
+        payload = self._generate_hook_config(url)
+        response = requests.post(
+            complete_url,
+            json=payload,
+            headers={
+                "Authorization": f"token {oauth.token}"
+            }
+        )
 
         return response

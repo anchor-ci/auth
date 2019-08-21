@@ -62,6 +62,7 @@ class User(db.Model):
             algorithm='HS256'
         )
 
+#TODO: Move username here.
 class OAuth(db.Model):
     id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid4, primary_key=True)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey(User.id))
